@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommendation AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-glass fixed-top">
+    <div class="container">
+      <a class="navbar-brand brand-logo" href="{{ url_for('index') }}">
+        <span class="brand-icon">🎬</span> Movie Recommendation <span class="brand-accent">AI</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Genres</a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-glass">
+              {% for g in genres %}
+              <li><a class="dropdown-item" href="{{ url_for('genre_filter', genre_name=g) }}">{{ g }}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content text-center">
+      <h1 class="hero-title">Find Your Next Favorite <span class="brand-accent">Movie</span></h1>
+      <p class="hero-subtitle">AI-powered recommendations, built on what you already love.</p>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="alert alert-warning glass-alert" role="alert">
+            {{ messages[0] }}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if not model_ready %}
+        <div class="alert alert-danger glass-alert" role="alert">
+          Recommendation model failed to load. Check <code>model/movie_recommendation.pkl</code> on the server.
+        </div>
+      {% endif %}
+
+      <form action="{{ url_for('recommend') }}" method="POST" class="search-form" id="searchForm">
+        <div class="search-bar-wrapper">
+          <input
+            type="text"
+            name="movie"
+            id="movieInput"
+            class="search-input"
+            placeholder="Search your favourite movie..."
+            autocomplete="off"
+            required
+          >
+          <button type="submit" class="btn-recommend" id="recommendBtn">
+            <span class="btn-text">Recommend</span>
+            <span class="btn-spinner d-none"></span>
+          </button>
+        </div>
+      </form>
+
+      <div class="genre-filter-wrapper">
+        <label for="genreSelect" class="genre-label">Or browse by genre</label>
+        <select id="genreSelect" class="form-select genre-select">
+          <option value="" selected disabled>Choose a genre...</option>
+          {% for g in genres %}
+          <option value="{{ g }}">{{ g }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Feature strip -->
+  <section class="container feature-strip">
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🧠</div>
+          <h5>Content-Based AI</h5>
+          <p>TF-IDF + cosine similarity match movies by story, tone, and theme.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🎯</div>
+          <h5>Genre Filters</h5>
+          <p>Jump straight into Action, Horror, Sci-Fi, Romance, and more.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card glass-card">
+          <div class="feature-icon">🖼️</div>
+          <h5>Live Posters & Ratings</h5>
+          <p>Real posters, overviews, and ratings pulled live from TMDB.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer text-center">
+    <p>Built with Flask, TF-IDF, and TMDB &middot; &copy; Movie Recommendation AI</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
